@@ -1,0 +1,23 @@
+[Unit]
+Description=Mavlink Telemetry
+After=systemd-remount-fs.service network.target
+RequiresMountsFor=/etc /usr
+
+[Service]
+Type=simple
+EnvironmentFile=/etc/systemd/mavproxy.conf
+RuntimeDirectory=mavproxy
+RuntimeDirectoryMode=0700
+ExecStartPre=/bin/sleep 10
+ExecStart=/usr/bin/python3 /usr/local/bin/mavproxy.py --master=${DEVICE},${BAUD} --out=${PROTOCOL}:${HOST}:${PORT} --target-system=${SYSID} --non-interactive --force-connected ${FLAGS} --debug
+StandardOutput=journal
+StandardError=journal
+Restart=on-failure
+RestartSec=10
+StartLimitInterval=100
+StartLimitBurst=5
+TimeoutStartSec=0
+TimeoutStopSec=5
+
+[Install]
+WantedBy=multi-user.target
