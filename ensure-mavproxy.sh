@@ -32,23 +32,29 @@ pkgdeps[python3-yaml]=true
 # with dry-run, just go thru packages and return an error if some are missing
 if $DRY_RUN ; then
 	declare -A todo
-	apt list --installed > /tmp/$$.pkgs 2>/dev/null	# NB: warning on stderr about unstable API
-	for m in ${!pkgdeps[@]} ; do
-		x=$(grep $m /tmp/$$.pkgs)
-		if [ -z "$x" ] ; then
-			echo "$m: missing"
-			todo[$m]=true
-		else
-			true #&& echo "$x"
-		fi
-	done
+	if [ -x apt ] ; then
+		apt list --installed > /tmp/$$.pkgs 2>/dev/null	# NB: warning on stderr about unstable API
+		for m in ${!pkgdeps[@]} ; do
+			x=$(grep $m /tmp/$$.pkgs)
+			if [ -z "$x" ] ; then
+				echo "$m: missing"
+				todo[$m]=true
+			else
+				true #&& echo "$x"
+			fi
+		done
+	else
+		# TODO: check for mavproxy installed in python
+	fi
 	if [ "${#todo[@]}" -gt 0 ] ; then echo "Please run: apt-get install -y ${!todo[@]}" ; fi
 	exit ${#todo[@]}
 fi
 # MAVProxy wants you to *uninstall* ModemManager (not simply ensure it doesn't run)
 $SUDO systemctl stop ModemManager
-$SUDO apt-get remove -y modemmanager
 set -e
-$SUDO apt-get install -y ${!pkgdeps[@]}
+if [ -x apt-get ] ; then
+	$SUDO apt-get remove -y modemmanager
+	$SUDO apt-get install -y ${!pkgdeps[@]}
+fi
 $SUDO -H pip3 install --upgrade MAVProxy && \
 echo "$(mavproxy --version)"

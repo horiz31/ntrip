@@ -35,7 +35,7 @@ clean:
 	/bin/true
 
 dependencies:
-	@if [ ! -z "$(PKGDEPS)" ] && [ -z "$(DRY_RUN)" ] ; then \
+	@if [ ! -z "$(PKGDEPS)" ] && [ -z "$(DRY_RUN)" ] && [ -x apt-get ] ; then \
 		$(SUDO) apt-get update ; \
 		$(SUDO) apt-get install -y $(PKGDEPS) ; \
 	fi
