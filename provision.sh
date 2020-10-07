@@ -14,7 +14,7 @@ shift
 DEFAULTS=false
 DRY_RUN=false
 while (($#)) ; do
-	if [ "$1" == "--dry-run" ] && ! $DRY_RUN ; then DRY_RUN=true ; set -x ;
+	if [ "$1" == "--dry-run" ] && ! $DRY_RUN ; then DRY_RUN=true ;
 	elif [ "$1" == "--defaults" ] ; then DEFAULTS=true ;
 	fi
 	shift
@@ -135,7 +135,6 @@ case "$(basename $CONF)" in
 		;;
 
 	network.conf)
-		# special case of provisioning the network - keep settings in config, but make nmcli calls here
 		IFACE=$(value_of IFACE eth0)
 		HOST=$(value_of HOST $(address_of ${IFACE}))
 		GATEWAY=$(value_of GATEWAY "")
@@ -145,27 +144,6 @@ case "$(basename $CONF)" in
 			HOST=$(interactive "$HOST" "IPv4 for RJ45 Network")
 			GATEWAY=$(interactive "$GATEWAY" "IPv4 gateway for RJ45 Network")
 			NETMASK=$(interactive "$NETMASK" "CDIR/netmask for RJ45 Network")
-		fi
-		if ! $DRY_RUN ; then
-			echo "auto lo" > /tmp/$$.interfaces
-			echo "iface lo inet loopback" >> /tmp/$$.interfaces
-			echo "" >> /tmp/$$.interfaces
-			echo "iface eth0 inet static" >> /tmp/$$.interfaces
-			echo "    address $HOST" >> /tmp/$$.interfaces
-			if [[ "$NETMASK" == *.* ]] ; then
-				echo "    netmask $NETMASK" >> /tmp/$$.interfaces
-				_NETWORK=$(ip2network $HOST $NETMASK)
-			else
-				echo "    netmask $(cidr2mask $NETMASK)" >> /tmp/$$.interfaces
-				_NETWORK=$(ip2network $HOST/$NETMASK)
-			fi
-			echo "    network $_NETWORK" >> /tmp/$$.interfaces
-			if [[ "$GATEWAY" == *.* ]] ; then
-				echo "    gateway $GATEWAY" >> /tmp/$$.interfaces
-			fi
-			set -x
-			$SUDO install -Dm644 /tmp/$$.interfaces /etc/network/interfaces
-			set +x
 		fi
 		echo "[Service]" > /tmp/$$.env && \
 		echo "IFACE=${IFACE}" >> /tmp/$$.env && \
@@ -295,7 +273,6 @@ SYNCNET
 esac
 
 if $DRY_RUN ; then
-	set +x
 	echo $CONF && cat /tmp/$$.env && echo ""
 elif [[ $(basename $CONF) == *.sh ]] ; then
 	$SUDO install -Dm755 /tmp/$$.env $CONF

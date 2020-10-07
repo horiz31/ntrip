@@ -58,11 +58,11 @@ provision:
 	$(MAKE) --no-print-directory -B $(SYSCFG)/gpsd.conf $(DRY_RUN)
 	$(MAKE) --no-print-directory -B $(SYSCFG)/ntpd.conf $(DRY_RUN)
 	@for s in $(SERVICES) ; do $(MAKE) --no-print-directory -B $(SYSCFG)/$${s%.*}.conf $(DRY_RUN) ; done
+	@./ensure-network.sh $(DRY_RUN)
 	$(SUDO) systemctl restart mavproxy
 
 show-config:
 	@for s in network.conf gpsd.conf ntpd.conf $(SERVICES) ; do echo "*** $${s%.*}.conf ***" && $(SUDO) cat $(SYSCFG)/$${s%.*}.conf ; done
-	@$(SUDO) cat /etc/network/interfaces
 
 test:
 	@gpspipe -r -n 20 127.0.0.1 2947
@@ -70,8 +70,7 @@ test:
 	@date
 
 uninstall:
-	@if [ ! -z "$(LOCAL_SCRIPTS)" ] ; then ( cd $(LOCAL)/bin && $(SUDO) rm $(LOCAL_SCRIPTS) ) ; fi
+	@-if [ ! -z "$(LOCAL_SCRIPTS)" ] ; then ( cd $(LOCAL)/bin && $(SUDO) rm $(LOCAL_SCRIPTS) ) ; fi
 	@-for c in stop disable ; do $(SUDO) systemctl $${c} $(SERVICES) ; done
 	@for s in $(SERVICES) ; do $(SUDO) rm $(LIBSYSTEMD)/$${s%.*}.service ; done
 	@if [ ! -z "$(SERVICES)" ] ; then $(SUDO) systemctl daemon-reload ; fi
-
