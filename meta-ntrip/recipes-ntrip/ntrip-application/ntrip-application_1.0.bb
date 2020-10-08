@@ -15,15 +15,16 @@ RDEPENDS_${PN} += " bash python3-core"
 
 S="${WORKDIR}/git"
 
-FILES_${PN} += "${prefix}/local/bin/*.sh"
+FILES_${PN} += "${prefix}/local/src/ntrip/*.sh"
 FILES_${PN} += "${systemd_unitdir}/system/*.service"
-FILES_${PN} += "${prefix}/local/bin/*.py"
+FILES_${PN} += "${prefix}/local/src/ntrip/*.py"
 FILES_${PN} += "${prefix}/local/src/ntrip/Makefile"
+FILES_${PN} += "${prefix}/local/src/ntrip/LICENSE"
 
 do_install() {
-    install -d ${D}${prefix}/local/bin
-    install -m 0755 ${S}/provision.sh ${D}${prefix}/local/bin
-    install -m 0755 ${S}/ensure-network.sh ${D}${prefix}/local/bin
+    install -d ${D}${prefix}/local/src/ntrip
+    install -m 0755 ${S}/provision.sh ${D}${prefix}/local/src/ntrip
+    install -m 0755 ${S}/ensure-network.sh ${D}${prefix}/local/src/ntrip
     install -m 0644 ${S}/Makefile ${D}${prefix}/local/src/ntrip
     install -m 0644 ${S}/LICENSE ${D}${prefix}/local/src/ntrip
 
