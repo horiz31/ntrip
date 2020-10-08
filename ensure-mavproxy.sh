@@ -10,10 +10,13 @@ DRY_RUN=false
 SUDO=$(test ${EUID} -ne 0 && which sudo)
 
 if [ "$1" == "--dry-run" ] ; then DRY_RUN=true ; fi
-MAVPROXY_VERSION=$(mavproxy.py --version)
-if ! [ -z "${MAVPROXY_VERSION}" ] ; then
-	echo "${MAVPROXY_VERSION}"
-	exit 0
+if [ -x mavproxy.py ] ; then
+	MAVPROXY_VERSION=$(mavproxy.py --version)
+	if ! [ -z "${MAVPROXY_VERSION}" ] ; then
+		echo "${MAVPROXY_VERSION}"
+		exit 0
+	fi
+	exit 1
 fi
 
 ##PKGDEPS=python3-dev python3-opencv python3-wxgtk3.0 python3-pip python3-matplotlib python3-pygame python3-lxml python3-yaml
@@ -43,8 +46,7 @@ if $DRY_RUN ; then
 				true #&& echo "$x"
 			fi
 		done
-	else
-		# TODO: check for mavproxy installed in python
+	# TODO: check for mavproxy installed in python"
 	fi
 	if [ "${#todo[@]}" -gt 0 ] ; then echo "Please run: apt-get install -y ${!todo[@]}" ; fi
 	exit ${#todo[@]}
@@ -56,5 +58,9 @@ if [ -x apt-get ] ; then
 	$SUDO apt-get remove -y modemmanager
 	$SUDO apt-get install -y ${!pkgdeps[@]}
 fi
-$SUDO -H pip3 install --upgrade MAVProxy && \
+if [ -z "$SUDO" ] ; then
+	pip3 install --upgrade MAVProxy
+else
+	$SUDO -H pip3 install --upgrade MAVProxy
+fi
 echo "$(mavproxy --version)"
