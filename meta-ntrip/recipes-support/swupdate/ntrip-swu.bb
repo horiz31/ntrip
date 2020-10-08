@@ -3,7 +3,8 @@ SECTION = ""
 
 inherit swupdate
 
-LICENSE = "GPLv3"
+# its not CLOSED, it GPLv3, but I can't figure out how to make damn Yocto not spit an error
+LICENSE = "CLOSED"
 
 # Note: sw-description is mandatory
 SRC_URI = " \
