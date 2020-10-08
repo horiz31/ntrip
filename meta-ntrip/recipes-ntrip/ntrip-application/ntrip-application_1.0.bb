@@ -2,6 +2,7 @@ SUMMARY = "NTRIP App Repo Pull"
 DESCRIPTION = "Provide access to MAVlink speaking flight controller, enabling RTK/PPK corrections via NTRIP servers"
 SECTION = "misc"
 LICENSE = "GPLv3"
+LIC_FILES_CHKSUM = "file://LICENSE;md5=1ebbd3e34237af26da5dc08a4e440464"
 PR = "r0"
 
 # Should pull the latest rev
@@ -23,7 +24,8 @@ do_install() {
     install -d ${D}${prefix}/local/bin
     install -m 0755 ${S}/provision.sh ${D}${prefix}/local/bin
     install -m 0755 ${S}/ensure-network.sh ${D}${prefix}/local/bin
-    install -m 0755 ${S}/Makefile ${D}${prefix}/local/src/ntrip
+    install -m 0644 ${S}/Makefile ${D}${prefix}/local/src/ntrip
+    install -m 0644 ${S}/LICENSE ${D}${prefix}/local/src/ntrip
 
     if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
         install -d ${D}${systemd_unitdir}/system
