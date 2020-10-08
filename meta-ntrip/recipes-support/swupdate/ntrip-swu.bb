@@ -3,6 +3,8 @@ SECTION = ""
 
 inherit swupdate
 
+LICENSE = "GPLv3"
+
 # Note: sw-description is mandatory
 SRC_URI = " \
 	file://ntrip-application.tar.gz \

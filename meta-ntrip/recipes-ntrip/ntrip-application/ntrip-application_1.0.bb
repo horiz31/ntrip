@@ -1,11 +1,9 @@
 SUMMARY = "NTRIP App Repo Pull"
 DESCRIPTION = "Provide access to MAVlink speaking flight controller, enabling RTK/PPK corrections via NTRIP servers"
 SECTION = "misc"
-#LICENSE = "CLOSED"
-# its not CLOSED, it GPLv3, but I can't figure out how to make damn Yocto not spit an error
 LICENSE = "GPLv3"
-LIC_FILES_CHKSUM = "file://LICENSE;md5=1ebbd3e34237af26da5dc08a4e440464"
-PR = "r2"
+LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/GPL-3.0;md5=c79ff39f19dfec6d293b95dea7b07891"
+PR = "r3"
 
 # Should pull the latest rev
 SRCBRANCH="feature/YoctoLayerDev"
@@ -42,5 +40,5 @@ do_install() {
 
     # Create tar.gz for swupdates
     tar -czvf ${WORKDIR}/ntrip-application.tar.gz --directory=${S}/ * 
-    mv -f ${WORKDIR}/ntrip-application.tar.gz ${WORKDIR}/../../../../../../sources/meta-ntrip/recipes-support/swupdate/ornl-ntrip-swu
+    mv -f ${WORKDIR}/ntrip-application.tar.gz ${WORKDIR}/../../../../../../sources/meta-ntrip/recipes-support/swupdate/ntrip-swu
 }
