@@ -22,6 +22,7 @@ FILES_${PN} += "${prefix}/local/src/ntrip/Makefile"
 FILES_${PN} += "${prefix}/local/src/ntrip/LICENSE"
 
 do_install() {
+    mkdir -p ${D}${prefix}/local/src
     install -d ${D}${prefix}/local/src/ntrip
     install -m 0755 ${S}/provision.sh ${D}${prefix}/local/src/ntrip
     install -m 0755 ${S}/ensure-network.sh ${D}${prefix}/local/src/ntrip
