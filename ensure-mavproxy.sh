@@ -8,10 +8,11 @@
 
 DRY_RUN=false
 SUDO=$(test ${EUID} -ne 0 && which sudo)
+MAVPROXY=$(which mavproxy.py)
 
 if [ "$1" == "--dry-run" ] ; then DRY_RUN=true ; fi
-if [ -x mavproxy.py ] ; then
-	MAVPROXY_VERSION=$(mavproxy.py --version)
+if ! [ -z "$MAVPROXY" ] ; then
+	MAVPROXY_VERSION=$(python3 $MAVPROXY --version)
 	if ! [ -z "${MAVPROXY_VERSION}" ] ; then
 		echo "${MAVPROXY_VERSION}"
 		exit 0
@@ -63,4 +64,5 @@ if [ -z "$SUDO" ] ; then
 else
 	$SUDO -H pip3 install --upgrade MAVProxy
 fi
-echo "$(mavproxy --version)"
+MAVPROXY=$(which mavproxy.py)
+echo "$(python3 $MAVPROXY --version)"
