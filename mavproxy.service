@@ -9,7 +9,7 @@ EnvironmentFile=/etc/systemd/mavproxy.conf
 RuntimeDirectory=mavproxy
 RuntimeDirectoryMode=0700
 ExecStartPre=/bin/sleep 10
-ExecStart=/usr/bin/python3 ${MAVPROXY} --master=${DEVICE},${BAUD} --out=${PROTOCOL}:${HOST}:${PORT} --target-system=${SYSID} --non-interactive --force-connected ${FLAGS} --load-module=ntrip
+ExecStart=/usr/bin/python3 ${MAVPROXY} --master=${DEVICE},${BAUD} --out=${PROTOCOL}:${HOST}:${PORT} --target-system=${SYSID} --non-interactive --force-connected ${FLAGS} --load-module=ntrip --default-module=ntrip
 StandardOutput=journal
 StandardError=journal
 Restart=on-failure
