@@ -100,7 +100,8 @@ case "$(basename $CONF)" in
 		if [ "${_FLOW}" == "on" ] || [[ ${_FLOW} == y* ]] ; then
 			if [[ ! " ${FLAGS[@]} " =~ " --rtscts " ]] ; then FLAGS=(--rtscts) ; fi
 		else
-			FLAGS=("")
+			# BUT! FLAGS cannot be empty for systemd, so we pick something benign
+			FLAGS=(--nodtr)
 		fi
 		# Need to track what type of --out device to use, based on HOST (udp, udpbcast)
 		# NB: mavproxy.py only intrprets udp or udpbcast.
