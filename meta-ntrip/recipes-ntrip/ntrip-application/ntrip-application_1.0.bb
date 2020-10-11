@@ -2,7 +2,8 @@ SUMMARY = "NTRIP App Repo Pull"
 DESCRIPTION = "Provide access to MAVlink speaking flight controller, enabling RTK/PPK corrections via NTRIP servers"
 SECTION = "misc"
 LICENSE = "GPLv3"
-PR = "r0"
+LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/GPL-3.0;md5=c79ff39f19dfec6d293b95dea7b07891"
+PR = "r3"
 
 # Should pull the latest rev
 SRCBRANCH="feature/YoctoLayerDev"
@@ -14,16 +15,19 @@ RDEPENDS_${PN} += " bash python3-core"
 
 S="${WORKDIR}/git"
 
-FILES_${PN} += "${prefix}/local/bin/*.sh"
+FILES_${PN} += "${prefix}/local/src/ntrip/*.sh"
 FILES_${PN} += "${systemd_unitdir}/system/*.service"
-FILES_${PN} += "${prefix}/local/bin/*.py"
+FILES_${PN} += "${prefix}/local/src/ntrip/*.py"
 FILES_${PN} += "${prefix}/local/src/ntrip/Makefile"
+FILES_${PN} += "${prefix}/local/src/ntrip/LICENSE"
 
 do_install() {
-    install -d ${D}${prefix}/local/bin
-    install -m 0755 ${S}/provision.sh ${D}${prefix}/local/bin
-    install -m 0755 ${S}/ensure-network.sh ${D}${prefix}/local/bin
-    install -m 0755 ${S}/Makefile ${D}${prefix}/local/src/ntrip
+    mkdir -p ${D}${prefix}/local/src
+    install -d ${D}${prefix}/local/src/ntrip
+    install -m 0755 ${S}/provision.sh ${D}${prefix}/local/src/ntrip
+    install -m 0755 ${S}/ensure-network.sh ${D}${prefix}/local/src/ntrip
+    install -m 0644 ${S}/Makefile ${D}${prefix}/local/src/ntrip
+    install -m 0644 ${S}/LICENSE ${D}${prefix}/local/src/ntrip
 
     if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
         install -d ${D}${systemd_unitdir}/system
@@ -36,5 +40,5 @@ do_install() {
 
     # Create tar.gz for swupdates
     tar -czvf ${WORKDIR}/ntrip-application.tar.gz --directory=${S}/ * 
-    mv -f ${WORKDIR}/ntrip-application.tar.gz ${WORKDIR}/../../../../../../sources/meta-ntrip/recipes-support/swupdate/ornl-ntrip-swu
+    mv -f ${WORKDIR}/ntrip-application.tar.gz ${WORKDIR}/../../../../../../sources/meta-ntrip/recipes-support/swupdate/ntrip-swu
 }

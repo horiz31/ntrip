@@ -5,15 +5,13 @@ if [ $# -lt 1 ]; then
 fi
 
 if [ $1 == "preinst" ] ; then
-	# Remove files in /usr/local/src/ntrip
-	rm -f /usr/local/src/ntrip/ensure-network.sh
-	rm -f /usr/local/src/ntrip/provision.sh
-	rm -f /usr/local/src/ntrip/Makefile
+	# must exist, else swupdate will fail
+	mkdir -p /usr/local/src/ntrip
 	exit 0
 fi
 
 if [ $1 == "postinst" ] ; then
-	rm /usr/local/src/ntrip/ntrip-application.tar.gz
-	mv -f /usr/local/src/ntrip/*.service /lib/systemd/system/
+	rm -f /usr/local/src/ntrip/ntrip-application.tar.gz
+	make -C /usr/local/src/ntrip install
 	exit 0
 fi

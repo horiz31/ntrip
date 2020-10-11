@@ -14,7 +14,14 @@ LIBSYSTEMD=/lib/systemd/system
 SERVICES=mavproxy.service
 SYSCFG=/etc/systemd
 
-.PHONY = clean dependencies git-cache install
+# Yocto environment integration
+EULA=1	# https://patchwork.openembedded.org/patch/100815/
+MACHINE=var-som-mx6-ornl
+YOCTO_DIR := $(HOME)/ornl-dart-yocto
+YOCTO_DISTRO=fslc-framebuffer
+YOCTO_ENV=build_ornl
+
+.PHONY = clean dependencies environment-update git-cache install
 .PHONY = provision show-config test uninstall
 
 default:
@@ -41,6 +48,19 @@ dependencies:
 	fi
 	@./ensure-gpsd.sh $(DRY_RUN)
 	@./ensure-mavproxy.sh $(DRY_RUN)
+
+environment-update: meta-ntrip $(YOCTO_DIR)/sources $(YOCTO_DIR)/$(YOCTO_ENV)
+	cp -r meta-ntrip $(YOCTO_DIR)/sources
+	@cd $(YOCTO_DIR) && \
+		MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV) && \
+		cd $(YOCTO_DIR)/$(YOCTO_ENV) && \
+			bitbake-layers add-layer ../sources/meta-ntrip && \
+		echo "*** ENVIRONMENT UPDATED ***" && \
+		echo "Please execute the following in your shell before giving bitbake commands:" && \
+		echo "cd $(YOCTO_DIR) && MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV)" && \
+		echo "" && \
+		echo "Afterward, you may execute:" && \
+		echo "bitbake ntrip-application && bitbake ntrip-swu"
 
 git-cache:
 	git config --global credential.helper "cache --timeout=5400"
