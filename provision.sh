@@ -164,15 +164,15 @@ case "$(basename $CONF)" in
 		# read /etc/default/gpsd, but we are keeping our own config
 		# in /etc/systemd/gpsd.conf
 		CONFIG=/etc/default/gpsd
-		MODEL=$(value_of MODEL M8P)
+		MODEL=$(value_of MODEL M8N)
 		if ! $DEFAULTS ; then
 			lsusb
 			MODEL=$(interactive "$MODEL" "GPS Model")
 		fi
 		if ! $DRY_RUN ; then
 			# TODO: need a cross-reference between model and VID/PID
-			# other models are M8N
-			if [[ $(contains "M8P" "$MODEL") == y* ]] ; then
+			# NB: this code is not needed for the yocto builds with gpsd that comes configured with udev rules for several GPS including the M8N
+			if [[ $(contains "M8P" "$MODEL") == y* ]] || [[ $(contains "M8N" "$MODEL") == y* ]] ; then
 				cat > /tmp/$$.gps.rules <<- GPSRULES
 SUBSYSTEMS=="usb", KERNEL=="ttyACM?", ATTRS{idVendor}=="1546", ATTRS{idProduct}=="01a8", SYMLINK+="gps"
 GPSRULES
@@ -184,6 +184,7 @@ GPSRULES
 				set +x
 			fi
 			# setup gpsd to make the GPS available to the local system
+			# NB: there is a message in /etc/default/gpsd to not edit the file directly but use 'dpkg-reconfigure gpsd' to reconfigure
 			cat > /tmp/$$.gpsd.conf <<- GPSCONFIG
 START_DAEMON="true"
 USBAUTO="true"
