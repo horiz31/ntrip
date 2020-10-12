@@ -25,5 +25,5 @@ if [ ! -z "$exist" ] ; then     # delete the interface if it exists
 fi
 # NB: we always start a new interface, because otherwise nmcli c mod keeps *adding* interfaces
 $SUDO nmcli c add con-name "static-$IFACE" ifname $IFACE type ethernet ip4 $HOST/$NETMASK
-if [[ "$GATEWAY" == *.* ]] ; then $SUDO nmcli c mod "static-$IFACE" ifname gw4 $GATEWAY ; fi
+if [[ "$GATEWAY" == *.* ]] ; then $SUDO nmcli c mod "static-$IFACE" ifname $IFACE gw4 $GATEWAY ; fi
 $SUDO nmcli c up "static-$IFACE"
