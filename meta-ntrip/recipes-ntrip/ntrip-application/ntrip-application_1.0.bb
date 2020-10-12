@@ -11,7 +11,7 @@ PV = "1.0+git${SRCPV}"
 SRCREV= "${AUTOREV}"
 SRC_URI = "git://github.com/horiz31/ntrip.git;protocol=https;branch=${SRCBRANCH}"
 
-RDEPENDS_${PN} += " bash python3-core python3-MAVproxy python3-netifaces python3-pymavlink python3-future sudo"
+RDEPENDS_${PN} += " bash python3-core python3-MAVproxy python3-netifaces python3-future sudo"
 
 S="${WORKDIR}/git"
 
