@@ -75,7 +75,7 @@ install: git-cache
 provision:
 	# NB: order is important in generating these files
 	$(MAKE) --no-print-directory -B $(SYSCFG)/network.conf $(DRY_RUN)
-	$(MAKE) --no-print-directory -B $(SYSCFG)/gpsd.conf $(DRY_RUN)
+	#$(MAKE) --no-print-directory -B $(SYSCFG)/gpsd.conf $(DRY_RUN)
 	$(MAKE) --no-print-directory -B $(SYSCFG)/ntpd.conf $(DRY_RUN)
 	@for s in $(SERVICES) ; do $(MAKE) --no-print-directory -B $(SYSCFG)/$${s%.*}.conf $(DRY_RUN) ; done
 	@./ensure-network.sh $(DRY_RUN)
