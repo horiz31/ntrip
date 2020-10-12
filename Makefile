@@ -50,6 +50,7 @@ dependencies:
 	@./ensure-mavproxy.sh $(DRY_RUN)
 
 environment-update: meta-ntrip $(YOCTO_DIR)/sources $(YOCTO_DIR)/$(YOCTO_ENV)
+	rm -rf $(YOCTO_DIR)/sources/meta-ntrip
 	cp -r meta-ntrip $(YOCTO_DIR)/sources
 	@cd $(YOCTO_DIR) && \
 		MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV) && \
