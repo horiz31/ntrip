@@ -3,7 +3,7 @@ DESCRIPTION = "Provide access to MAVlink speaking flight controller, enabling RT
 SECTION = "misc"
 LICENSE = "GPLv3"
 LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/GPL-3.0;md5=c79ff39f19dfec6d293b95dea7b07891"
-PR = "bfg-r2"
+PR = "bfg-r3"
 
 # Should pull the latest rev
 SRCBRANCH="bfg"
@@ -11,7 +11,7 @@ PV = "1.0+git${SRCPV}"
 SRCREV= "${AUTOREV}"
 SRC_URI = "git://github.com/horiz31/ntrip.git;protocol=https;branch=${SRCBRANCH}"
 
-RDEPENDS_${PN} += " bash python3-core python3-MAVproxy python3-netifaces python3-future sudo"
+RDEPENDS_${PN} += " bash python3-core python3-netifaces python3-future sudo"
 
 S="${WORKDIR}/git"
 
