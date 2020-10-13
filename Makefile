@@ -11,7 +11,7 @@ PKGDEPS=sudo python3-netifaces
 LOCAL=/usr/local
 LOCAL_SCRIPTS=
 LIBSYSTEMD=/lib/systemd/system
-SERVICES=mavproxy.service
+SERVICES=ensure-network.service mavproxy.service
 SYSCFG=/etc/systemd
 
 # Yocto environment integration
@@ -78,12 +78,12 @@ provision:
 	$(MAKE) --no-print-directory -B $(SYSCFG)/network.conf $(DRY_RUN)
 	#$(MAKE) --no-print-directory -B $(SYSCFG)/gpsd.conf $(DRY_RUN)
 	$(MAKE) --no-print-directory -B $(SYSCFG)/ntpd.conf $(DRY_RUN)
-	@for s in $(SERVICES) ; do $(MAKE) --no-print-directory -B $(SYSCFG)/$${s%.*}.conf $(DRY_RUN) ; done
+	$(MAKE) --no-print-directory -B $(SYSCFG)/mavproxy.conf $(DRY_RUN)
 	@./ensure-network.sh $(DRY_RUN)
 	$(SUDO) systemctl restart mavproxy
 
 show-config:
-	@for s in network.conf gpsd.conf ntpd.conf $(SERVICES) ; do echo "*** $${s%.*}.conf ***" && $(SUDO) cat $(SYSCFG)/$${s%.*}.conf ; done
+	@for s in network.conf gpsd.conf ntpd.conf mavproxy.conf ; do echo "*** $${s%.*}.conf ***" && $(SUDO) cat $(SYSCFG)/$${s%.*}.conf ; done
 
 test:
 	@gpspipe -r -n 20 127.0.0.1 2947

@@ -1,6 +1,6 @@
 [Unit]
 Description=Mavlink Telemetry
-After=systemd-remount-fs.service network.target
+After=systemd-remount-fs.service network.target ensure-network.service
 RequiresMountsFor=/etc /usr
 
 [Service]
