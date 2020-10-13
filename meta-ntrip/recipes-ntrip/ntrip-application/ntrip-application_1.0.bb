@@ -3,7 +3,7 @@ DESCRIPTION = "Provide access to MAVlink speaking flight controller, enabling RT
 SECTION = "misc"
 LICENSE = "GPLv3"
 LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/GPL-3.0;md5=c79ff39f19dfec6d293b95dea7b07891"
-PR = "r8"
+PR = "r9"
 
 # Should pull the latest rev
 SRCBRANCH="bfg"
@@ -35,9 +35,12 @@ do_install() {
 
     if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
         install -d ${D}${systemd_unitdir}/system
-        install -d ${D}${sysconfdir}/systemd/system/multi-user.target.wants
+        install -m 0644 ${S}/ensure-network.service ${D}${systemd_unitdir}/system
         install -m 0644 ${S}/mavproxy.service ${D}${systemd_unitdir}/system
 
+        install -d ${D}${sysconfdir}/systemd/system/multi-user.target.wants
+        ln -sf ${systemd_unitdir}/system/ensure-network.service \
+            ${D}${sysconfdir}/systemd/system/multi-user.target.wants/ensure-network.service
         ln -sf ${systemd_unitdir}/system/mavproxy.service \
             ${D}${sysconfdir}/systemd/system/multi-user.target.wants/mavproxy.service
     fi
