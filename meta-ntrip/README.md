@@ -2,9 +2,7 @@
 
 This file contains information on the contents of the ../sources/meta-ntrip layer.
 
-***IMPORTANT
-In order to run bitbake and build the NTRIP SWU image, you have to configure your Yocto build environment.
-***
+**IMPORTANT* In order to run bitbake and build the NTRIP SWU image, you have to configure your Yocto build environment.*
 
 ## Configuring your build environment
 
