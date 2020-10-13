@@ -4,7 +4,7 @@ Code for managing Networked Transport of RTCM via Internet Protocol
 
 ## Features
 
- 1. Static IP for RJ45 (ethernet) network - input as manufacturing step.  `10.1.1.1/8`.
+ 1. Static IP for RJ45 (ethernet) network - input as manufacturing step.  `10.0.2.2/8`.
  2. Use a proxy to/from UART to Mavlink FMU and `udp://10.255.255.255:14550`.
 
 ## Setup
