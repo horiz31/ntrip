@@ -97,7 +97,7 @@ case "$(basename $CONF)" in
 			
 		fi
 		# Different systems have mavproxy installed in various places
-		MAVPROXY=$(which mavproxy.py)
+		MAVPROXY=/usr/bin/mavproxy.py
 		# mavproxy wants LOCALAPPDATA to be valid
 		LOCALAPPDATA='/tmp'
 		# FLAGS must keep the --rtscts as that is what mavproxy uses
