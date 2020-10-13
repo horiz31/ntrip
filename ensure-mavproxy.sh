@@ -8,7 +8,7 @@
 
 DRY_RUN=false
 SUDO=$(test ${EUID} -ne 0 && which sudo)
-MAVPROXY=$(which mavproxy.py)
+MAVPROXY=/usr/lib/mavproxy.py
 
 if [ "$1" == "--dry-run" ] ; then DRY_RUN=true ; fi
 if ! [ -z "$MAVPROXY" ] ; then
