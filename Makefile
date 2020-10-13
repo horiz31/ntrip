@@ -11,10 +11,17 @@ PKGDEPS=sudo python3-netifaces
 LOCAL=/usr/local
 LOCAL_SCRIPTS=
 LIBSYSTEMD=/lib/systemd/system
-SERVICES=mavproxy.service
+SERVICES=ensure-network.service mavproxy.service
 SYSCFG=/etc/systemd
 
-.PHONY = clean dependencies git-cache install
+# Yocto environment integration
+EULA=1	# https://patchwork.openembedded.org/patch/100815/
+MACHINE=var-som-mx6-ornl
+YOCTO_DIR := $(HOME)/ornl-dart-yocto
+YOCTO_DISTRO=fslc-framebuffer
+YOCTO_ENV=build_ornl
+
+.PHONY = clean dependencies environment-update git-cache install
 .PHONY = provision show-config test uninstall
 
 default:
@@ -35,12 +42,26 @@ clean:
 	/bin/true
 
 dependencies:
-	@if [ ! -z "$(PKGDEPS)" ] && [ -z "$(DRY_RUN)" ] ; then \
+	@if [ ! -z "$(PKGDEPS)" ] && [ -z "$(DRY_RUN)" ] && [ -x apt-get ] ; then \
 		$(SUDO) apt-get update ; \
 		$(SUDO) apt-get install -y $(PKGDEPS) ; \
 	fi
 	@./ensure-gpsd.sh $(DRY_RUN)
 	@./ensure-mavproxy.sh $(DRY_RUN)
+
+environment-update: meta-ntrip $(YOCTO_DIR)/sources $(YOCTO_DIR)/$(YOCTO_ENV)
+	rm -rf $(YOCTO_DIR)/sources/meta-ntrip
+	cp -r meta-ntrip $(YOCTO_DIR)/sources
+	@cd $(YOCTO_DIR) && \
+		MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV) && \
+		cd $(YOCTO_DIR)/$(YOCTO_ENV) && \
+			bitbake-layers add-layer ../sources/meta-ntrip && \
+		echo "*** ENVIRONMENT UPDATED ***" && \
+		echo "Please execute the following in your shell before giving bitbake commands:" && \
+		echo "cd $(YOCTO_DIR) && MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV)" && \
+		echo "" && \
+		echo "Afterward, you may execute:" && \
+		echo "bitbake ntrip-application && bitbake ntrip-swu"
 
 git-cache:
 	git config --global credential.helper "cache --timeout=5400"
@@ -55,14 +76,14 @@ install: git-cache
 provision:
 	# NB: order is important in generating these files
 	$(MAKE) --no-print-directory -B $(SYSCFG)/network.conf $(DRY_RUN)
-	$(MAKE) --no-print-directory -B $(SYSCFG)/gpsd.conf $(DRY_RUN)
+	#$(MAKE) --no-print-directory -B $(SYSCFG)/gpsd.conf $(DRY_RUN)
 	$(MAKE) --no-print-directory -B $(SYSCFG)/ntpd.conf $(DRY_RUN)
-	@for s in $(SERVICES) ; do $(MAKE) --no-print-directory -B $(SYSCFG)/$${s%.*}.conf $(DRY_RUN) ; done
+	$(MAKE) --no-print-directory -B $(SYSCFG)/mavproxy.conf $(DRY_RUN)
+	@./ensure-network.sh $(DRY_RUN)
 	$(SUDO) systemctl restart mavproxy
 
 show-config:
-	@for s in network.conf gpsd.conf ntpd.conf $(SERVICES) ; do echo "*** $${s%.*}.conf ***" && $(SUDO) cat $(SYSCFG)/$${s%.*}.conf ; done
-	@$(SUDO) cat /etc/network/interfaces
+	@for s in network.conf gpsd.conf ntpd.conf mavproxy.conf ; do echo "*** $${s%.*}.conf ***" && $(SUDO) cat $(SYSCFG)/$${s%.*}.conf ; done
 
 test:
 	@gpspipe -r -n 20 127.0.0.1 2947
@@ -70,8 +91,7 @@ test:
 	@date
 
 uninstall:
-	@if [ ! -z "$(LOCAL_SCRIPTS)" ] ; then ( cd $(LOCAL)/bin && $(SUDO) rm $(LOCAL_SCRIPTS) ) ; fi
+	@-if [ ! -z "$(LOCAL_SCRIPTS)" ] ; then ( cd $(LOCAL)/bin && $(SUDO) rm $(LOCAL_SCRIPTS) ) ; fi
 	@-for c in stop disable ; do $(SUDO) systemctl $${c} $(SERVICES) ; done
 	@for s in $(SERVICES) ; do $(SUDO) rm $(LIBSYSTEMD)/$${s%.*}.service ; done
 	@if [ ! -z "$(SERVICES)" ] ; then $(SUDO) systemctl daemon-reload ; fi
-

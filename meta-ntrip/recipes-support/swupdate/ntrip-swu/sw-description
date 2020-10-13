@@ -1,0 +1,24 @@
+software =
+{
+	version = "0.1.0";
+
+	var-som-mx6-ornl = {
+		hardware-compatibility: [ "1.0" ];
+
+		files: (
+			{
+				filename = "ntrip-application.tar.gz";
+				type = "archive";
+				compressed = true;
+				path = "/usr/local/src/ntrip";
+			}
+		);
+
+		scripts: (
+			{
+				filename = "ntrip-update.sh";
+				type = "shellscript";
+			}
+		);
+	};
+}

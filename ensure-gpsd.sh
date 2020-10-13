@@ -8,10 +8,11 @@ DRY_RUN=false
 SUDO=$(test ${EUID} -ne 0 && which sudo)
 
 if [ "$1" == "--dry-run" ] ; then DRY_RUN=true && SUDO="echo ${SUDO}" ; fi
-if [ ! "$1" == "--update" ] ; then
+if [ ! "$1" == "--update" ] || ! [ -x apt-get ] ; then
 	if ! gpsd -V ; then
 		exit 1
 	fi
+	if ! [ -x apt-get ] ; then exit 0 ; fi
 fi
 
 ##PKGDEPS=gpsd gpsd-clients ntpstat

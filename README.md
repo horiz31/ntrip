@@ -4,10 +4,11 @@ Code for managing Networked Transport of RTCM via Internet Protocol
 
 ## Features
 
- 1. Static IP for RJ45 (ethernet) network - input as manufacturing step.  `172.20.x.y/16`.
- 2. Use a proxy to/from UART to Pixhawk and `udp://172.20.255.255:14550`.
+ 1. Static IP for RJ45 (ethernet) network - input as manufacturing step.  `10.1.1.1/8`.
+ 2. Use a proxy to/from UART to Mavlink FMU and `udp://10.255.255.255:14550`.
 
 ## Setup
+
 To configure the software, execute the following commands:
 ```
 make dependencies
@@ -31,6 +32,9 @@ This causes all the settings to be inspected and interactively changed.  Typical
 ## Services
 The following services will be configured to execute upon system startup.
 
+### ensure-network
+A script to make `nmcli` calls to setup the static IP for the RJ45 (ethernet) network.  This exists to allow the network parameters to be kept in a configuration file/partition that can be edited and then applied at boot time, persist across software updates and configured easily via software update files.
+
 ### gpsd
 The GPS daemon.  This is a service that interfaces to GPS devices and provides local access to location.
 
@@ -39,6 +43,17 @@ The program to connect a UDP port to the autopilot.  The program connects UDP pa
 
 ### ntpd
 A program to keep local system time synchronized.  **(currently, the program is configured to interpret the pulse-per-second signal available on PixC3/PixC4 hardware.**
+
+## Yocto Layer
+
+A Yocto layer `meta-ntrip` is provided.  See the meta-ntrip/README.md file for details on its use and configuration.
+
+### Quick Start
+
+To setup your build environment, you can give the following command:
+```
+make environment-update
+```
 
 ## References
 * [MAVProxy PR#408](https://github.com/ArduPilot/MAVProxy/pull/408)

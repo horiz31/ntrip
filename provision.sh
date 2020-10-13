@@ -14,7 +14,7 @@ shift
 DEFAULTS=false
 DRY_RUN=false
 while (($#)) ; do
-	if [ "$1" == "--dry-run" ] && ! $DRY_RUN ; then DRY_RUN=true ; set -x ;
+	if [ "$1" == "--dry-run" ] && ! $DRY_RUN ; then DRY_RUN=true ;
 	elif [ "$1" == "--defaults" ] ; then DEFAULTS=true ;
 	fi
 	shift
@@ -96,11 +96,16 @@ case "$(basename $CONF)" in
 			SYSID=$(interactive "$SYSID" "System ID of the flight controller")
 			
 		fi
+		# Different systems have mavproxy installed in various places
+		MAVPROXY=/usr/bin/mavproxy.py
+		# mavproxy wants LOCALAPPDATA to be valid
+		LOCALAPPDATA='/tmp'
 		# FLAGS must keep the --rtscts as that is what mavproxy uses
 		if [ "${_FLOW}" == "on" ] || [[ ${_FLOW} == y* ]] ; then
 			if [[ ! " ${FLAGS[@]} " =~ " --rtscts " ]] ; then FLAGS=(--rtscts) ; fi
 		else
-			FLAGS=("")
+			# BUT! FLAGS cannot be empty for systemd, so we pick something benign
+			FLAGS=(--nodtr)
 		fi
 		# Need to track what type of --out device to use, based on HOST (udp, udpbcast)
 		# NB: mavproxy.py only intrprets udp or udpbcast.
@@ -130,12 +135,13 @@ case "$(basename $CONF)" in
 		echo "IFACE=${IFACE}" >> /tmp/$$.env && \
 		echo "PROTOCOL=${PROTOCOL}" >> /tmp/$$.env && \
 		echo "HOST=${HOST}" >> /tmp/$$.env && \
+		echo "LOCALAPPDATA=${LOCALAPPDATA}" >> /tmp/$$.env && \
+		echo "MAVPROXY=${MAVPROXY}" >> /tmp/$$.env && \
 		echo "PORT=${PORT}" >> /tmp/$$.env && \
 		echo "SYSID=${SYSID}" >> /tmp/$$.env
 		;;
 
 	network.conf)
-		# special case of provisioning the network - keep settings in config, but make nmcli calls here
 		IFACE=$(value_of IFACE eth0)
 		HOST=$(value_of HOST $(address_of ${IFACE}))
 		GATEWAY=$(value_of GATEWAY "")
@@ -145,27 +151,6 @@ case "$(basename $CONF)" in
 			HOST=$(interactive "$HOST" "IPv4 for RJ45 Network")
 			GATEWAY=$(interactive "$GATEWAY" "IPv4 gateway for RJ45 Network")
 			NETMASK=$(interactive "$NETMASK" "CDIR/netmask for RJ45 Network")
-		fi
-		if ! $DRY_RUN ; then
-			echo "auto lo" > /tmp/$$.interfaces
-			echo "iface lo inet loopback" >> /tmp/$$.interfaces
-			echo "" >> /tmp/$$.interfaces
-			echo "iface eth0 inet static" >> /tmp/$$.interfaces
-			echo "    address $HOST" >> /tmp/$$.interfaces
-			if [[ "$NETMASK" == *.* ]] ; then
-				echo "    netmask $NETMASK" >> /tmp/$$.interfaces
-				_NETWORK=$(ip2network $HOST $NETMASK)
-			else
-				echo "    netmask $(cidr2mask $NETMASK)" >> /tmp/$$.interfaces
-				_NETWORK=$(ip2network $HOST/$NETMASK)
-			fi
-			echo "    network $_NETWORK" >> /tmp/$$.interfaces
-			if [[ "$GATEWAY" == *.* ]] ; then
-				echo "    gateway $GATEWAY" >> /tmp/$$.interfaces
-			fi
-			set -x
-			$SUDO install -Dm644 /tmp/$$.interfaces /etc/network/interfaces
-			set +x
 		fi
 		echo "[Service]" > /tmp/$$.env && \
 		echo "IFACE=${IFACE}" >> /tmp/$$.env && \
@@ -179,15 +164,15 @@ case "$(basename $CONF)" in
 		# read /etc/default/gpsd, but we are keeping our own config
 		# in /etc/systemd/gpsd.conf
 		CONFIG=/etc/default/gpsd
-		MODEL=$(value_of MODEL M8P)
+		MODEL=$(value_of MODEL M8N)
 		if ! $DEFAULTS ; then
 			lsusb
 			MODEL=$(interactive "$MODEL" "GPS Model")
 		fi
 		if ! $DRY_RUN ; then
 			# TODO: need a cross-reference between model and VID/PID
-			# other models are M8N
-			if [[ $(contains "M8P" "$MODEL") == y* ]] ; then
+			# NB: this code is not needed for the yocto builds with gpsd that comes configured with udev rules for several GPS including the M8N
+			if [[ $(contains "M8P" "$MODEL") == y* ]] || [[ $(contains "M8N" "$MODEL") == y* ]] ; then
 				cat > /tmp/$$.gps.rules <<- GPSRULES
 SUBSYSTEMS=="usb", KERNEL=="ttyACM?", ATTRS{idVendor}=="1546", ATTRS{idProduct}=="01a8", SYMLINK+="gps"
 GPSRULES
@@ -199,6 +184,7 @@ GPSRULES
 				set +x
 			fi
 			# setup gpsd to make the GPS available to the local system
+			# NB: there is a message in /etc/default/gpsd to not edit the file directly but use 'dpkg-reconfigure gpsd' to reconfigure
 			cat > /tmp/$$.gpsd.conf <<- GPSCONFIG
 START_DAEMON="true"
 USBAUTO="true"
@@ -295,7 +281,6 @@ SYNCNET
 esac
 
 if $DRY_RUN ; then
-	set +x
 	echo $CONF && cat /tmp/$$.env && echo ""
 elif [[ $(basename $CONF) == *.sh ]] ; then
 	$SUDO install -Dm755 /tmp/$$.env $CONF
