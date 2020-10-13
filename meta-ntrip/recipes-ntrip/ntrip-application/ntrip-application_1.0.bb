@@ -3,7 +3,7 @@ DESCRIPTION = "Provide access to MAVlink speaking flight controller, enabling RT
 SECTION = "misc"
 LICENSE = "GPLv3"
 LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/GPL-3.0;md5=c79ff39f19dfec6d293b95dea7b07891"
-PR = "r4"
+PR = "r6"
 
 # Should pull the latest rev
 SRCBRANCH="bfg"
