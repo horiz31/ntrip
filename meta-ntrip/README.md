@@ -1,17 +1,26 @@
-This README file contains information on the contents of the ../sources/meta-ntrip layer.
+# ntrip/meta-ntrip
 
-***IMPORTANT
-In order to run bitbake and build the NTRIP SWU image, you first have to build the ntrip-application recipe.***
+This file contains information on the contents of the ../sources/meta-ntrip layer.
 
-bitbake ntrip-application
+**IMPORTANT* In order to run bitbake and build the NTRIP SWU image, you have to configure your Yocto build environment.*
 
-This will create a tar.gz file in the swuupdate folder and attach it to the .swu that is sent to the device.
+## Configuring your build environment
 
-Please see the corresponding sections below for details.
+You will need a build environment.  This is setup thru this project *(which is a pre-requisite)*:
+https://github.com/uvdl/yocto-ornl
 
-## Patches
+### Quick Start
 
-Please submit any pull requests against the `meta-ntrip` layer to https://github.com/uvdl/ntrip
+```
+cd $HOME
+git clone https://github.com/uvdl/yocto-ornl.git
+( cd yocto-ornl && make dependencies && make environment )
+```
+
+**NOTE: `make dependencies` only needs to be done once on a build machine.**
+**NOTE: by default, `make environment` will setup your Yocto environment into `$HOME/ornl-dart-yocto/build_ornl`.**
+
+You **must** follow the instructions at the end of the above environment update script.  The Yocto build system is based on many environment variables set in your current shell.  These are **NOT** portable between shells or shell windows.  Get used to calling `setup-environment` whenever (if) you start a new shell.  Or, keep a long running shell that is setup once.
 
 ## Adding the ../sources/meta-ntrip layer to your build environment
 
@@ -20,6 +29,12 @@ Please submit any pull requests against the `meta-ntrip` layer to https://github
  1. copy this (`meta-ntrip`) folder to `$YOCTO_DIR/sources/meta-ntrip`
  2. from `$YOCTO_DIR/$YOCTO_ENV`, run `bitbake-layers add-layer ../sources/meta-ntrip`
 
+### Quick Start
+
+```
+make environment-update
+```
+
 ## Building
 
 **(ensure you are in your build environment.  That means you have done setup-environment in your shell.)**
@@ -27,5 +42,25 @@ Please submit any pull requests against the `meta-ntrip` layer to https://github
  1. from `$YOCTO_DIR/$YOCTO_ENV`, run `bitbake ntrip-application`
  2. from `$YOCTO_DIR/$YOCTO_ENV`, run `bitbake ntrip-swu`
 
-Then there will be a file with a `.swu` extension built that you can upload to your device to update the software.
-You will then need to connect to a console and `make provision` in the `/usr/local/src/ntrip` folder.
+Then there will be a file with a `.swu` extension built at:
+`$YOCTO_DIR/$YOCTO_ENV/tmp/deploy/images/$MACHINE/ntrip-swu-$MACHINE-YYYYMMDDHHMMSS.swu`.  Where:
+
+```
+MACHINE=var-som-mx6-ornl
+```
+
+You can upload that file to your device to update the application and its configuration.
+
+## Configuring the application at runtime
+
+You can also change parameters of the application after it is installed.
+You will need to connect to a console and perform `make provision` in the `/usr/local/src/ntrip` folder:
+
+```
+make -C /usr/local/src/ntrip provision
+```
+
+## Patches
+
+Please submit any pull requests against the `meta-ntrip` layer to https://github.com/uvdl/ntrip
+
