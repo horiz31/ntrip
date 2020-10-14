@@ -6,14 +6,14 @@ This file contains information on the contents of the ../sources/meta-ntrip laye
 
 ## Configuring your build environment
 
-You will need a build environment for the pixc4.  This is setup thru the `pixc4` branch of this fork:
-https://github.com/horiz31/yocto-ornl
+You will need a build environment.  This is setup thru this project *(which is a pre-requisite)*:
+https://github.com/uvdl/yocto-ornl
 
 ### Quick Start
 
 ```
 cd $HOME
-git clone https://github.com/horiz31/yocto-ornl.git -b pixc4
+git clone https://github.com/uvdl/yocto-ornl.git
 ( cd yocto-ornl && make dependencies && make environment )
 ```
 
