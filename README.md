@@ -4,8 +4,10 @@ Code for managing Networked Transport of RTCM via Internet Protocol
 
 ## Features
 
- 1. Static IP for RJ45 (ethernet) network - input as manufacturing step.  `10.0.2.2/8`.
- 2. Use a proxy to/from UART to Mavlink FMU and `udp://10.255.255.255:14550`.
+ 1. Static IP for RJ45 (ethernet) network.  default `10.223.1.1/16`, change in `config/network.conf` before buiding the layer.
+ 2. Use a proxy to/from UART to Mavlink FMU and `udp://10.223.255.255:14550`.
+
+**(NOTE: 10.223.x.y/16 is the factory reset condition for the Doodle SmartRadio, a popular Digital Data Link device)**
 
 ## Setup
 
