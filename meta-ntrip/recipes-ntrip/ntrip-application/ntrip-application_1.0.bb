@@ -3,7 +3,7 @@ DESCRIPTION = "Provide access to MAVlink speaking flight controller, enabling RT
 SECTION = "misc"
 LICENSE = "GPLv3"
 LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/GPL-3.0;md5=c79ff39f19dfec6d293b95dea7b07891"
-PR = "r12"
+PR = "r13"
 
 # Should pull the latest rev
 SRCBRANCH="fix/rootfs"
@@ -28,12 +28,15 @@ FILES_${PN} += " \
 	${systemd_unitdir}/system/ensure-network.service \
 	${systemd_unitdir}/system/mavproxy.service \
 "
+# https://stackoverflow.com/questions/38099893/yocto-linux-module-recipe-do-package-qa-error
+# which is unintelligible, but basically says no ${D} in FILES_${PN}...  I am assuming
+# that ${prefix} is /usr so I dont want that...  And ${prefix}/../etc would be wierd...
 FILES_${PN} += " \
-	${D}/etc/ntp.conf \
-	${D}/etc/systemd/gpsd.conf \
-	${D}/etc/systemd/mavproxy.conf \
-	${D}/etc/systemd/network.conf \
-	${D}/etc/systemd/ntpd.conf \
+	/etc/ntp.conf \
+	/etc/systemd/gpsd.conf \
+	/etc/systemd/mavproxy.conf \
+	/etc/systemd/network.conf \
+	/etc/systemd/ntpd.conf \
 "
 
 # NB: it appears that the below only gets called when creating a rootfs image
