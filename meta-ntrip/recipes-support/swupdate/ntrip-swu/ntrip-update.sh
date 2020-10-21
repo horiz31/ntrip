@@ -20,7 +20,7 @@ if [ $1 == "postinst" ] ; then
 	# scripts
 	install -m 0755 ${S}/ensure-network.sh ${D}/usr/local/bin
 	# put config files in the needed places
-	install -m 0644 ${S}/config/etc-ntp.conf ${D}/etc/ntp.conf
+	install -m 0644 ${S}/config/etc-ntp.conf ${D}/etc
 	install -m 0644 ${S}/config/gpsd.conf ${D}/etc/systemd
 	install -m 0644 ${S}/config/mavproxy.conf ${D}/etc/systemd
 	install -m 0644 ${S}/config/network.conf ${D}/etc/systemd

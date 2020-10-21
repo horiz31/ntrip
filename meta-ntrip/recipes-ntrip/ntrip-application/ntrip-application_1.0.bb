@@ -3,7 +3,7 @@ DESCRIPTION = "Provide access to MAVlink speaking flight controller, enabling RT
 SECTION = "misc"
 LICENSE = "GPLv3"
 LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/GPL-3.0;md5=c79ff39f19dfec6d293b95dea7b07891"
-PR = "r11"
+PR = "r12"
 
 # Should pull the latest rev
 SRCBRANCH="fix/rootfs"
@@ -51,7 +51,8 @@ do_install() {
 	install -m 0755 ${S}/ensure-network.sh ${D}${prefix}/local/bin
 
 	# provide customer-specific configuration files for non-interactive software update
-	install -m 0644 ${S}/config/etc-ntp.conf ${D}/etc/ntp.conf
+	install -d ${D}/etc
+	install -m 0644 ${S}/config/etc-ntp.conf ${D}/etc
 	install -d ${D}/etc/systemd
 	install -m 0644 ${S}/config/gpsd.conf ${D}/etc/systemd
 	install -m 0644 ${S}/config/mavproxy.conf ${D}/etc/systemd
