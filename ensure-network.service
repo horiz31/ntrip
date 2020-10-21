@@ -6,7 +6,7 @@ RequiresMountsFor=/etc /usr
 [Service]
 Type=simple
 EnvironmentFile=/etc/systemd/network.conf
-ExecStart=/usr/local/src/ntrip/ensure-network.sh
+ExecStart=/usr/local/bin/ensure-network.sh
 StandardOutput=journal
 StandardError=journal
 Restart=on-failure
